@@ -92,6 +92,10 @@ public class DefaultInfrastructureModule : Module
 		builder.RegisterType<UserService>()
 			.As<IUserService>()
 			.InstancePerLifetimeScope();
+
+		builder.RegisterType<BookingService>()
+			.As<IBookingService>()
+			.InstancePerLifetimeScope();
 	}
 
 	private void RegisterDevelopmentOnlyDependencies(ContainerBuilder builder)
