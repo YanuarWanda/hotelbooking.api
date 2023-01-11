@@ -5,5 +5,5 @@ namespace hotelbooking.api.Core.Interfaces;
 
 public interface IBookingService : IBaseReadRepository<User>
 {
-	Task<bool> IsRoomBooked(Guid roomId, CancellationToken cancellationToken);
+	bool IsRoomBooked(Guid roomId, DateTime? checkInDate, DateTime? checkOutDate);
 }

@@ -21,13 +21,29 @@ public class BookingService : IBookingService
 		return query;
 	}
 
-	public async Task<bool> IsRoomBooked(Guid roomId, CancellationToken cancellationToken)
+	public bool IsRoomBooked(Guid roomId, DateTime? checkInDate, DateTime? checkOutDate)
 	{
-		var booking = await GetBaseBookingQueryable()
+		var existingBookings = GetBaseBookingQueryable()
 			.Where(b => b.RoomId.Equals(roomId))
-			.FirstOrDefaultAsync(cancellationToken);
+			.ToList();
 
-		return booking != null;
+		if (existingBookings != null && existingBookings.Count > 0)
+		{
+			foreach(var existingBooking in existingBookings)
+			{
+				if
+				(
+					(checkInDate >= existingBooking.CheckInDate && checkInDate <= existingBooking.CheckOutDate) ||
+					(checkOutDate >= existingBooking.CheckInDate && checkInDate <= existingBooking.CheckOutDate) ||
+					(checkInDate <= existingBooking.CheckInDate && checkOutDate >= existingBooking.CheckOutDate)
+				)
+				{
+					return true;
+				}
+			}
+		}
+
+		return false;
 	}
 
 	public Task<IReadOnlyList<User>> GetAllAsync(int page, int size, CancellationToken cancellationToken)

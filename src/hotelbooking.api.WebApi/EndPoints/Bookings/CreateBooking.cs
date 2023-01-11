@@ -43,7 +43,7 @@ public class CreateBooking : EndpointBaseAsync.WithRequest<CreateBookingRequest>
 			return BadRequest(ValidationExceptionBuilder.Build(validationResult.Errors));
 		}
 
-		var isRoomBooked = await _bookingService.IsRoomBooked(request.RoomId!, cancellationToken);
+		var isRoomBooked = _bookingService.IsRoomBooked(request.RoomId!, request.CheckInDate, request.CheckOutDate);
 		if (isRoomBooked)
 			return BadRequest(ErrorResponseExtension.Create("Room already booked"));
 

@@ -15,13 +15,13 @@ namespace hotelbooking.api.WebApi.EndPoints.Rooms;
 
 public class GetRooms : EndpointBaseAsync.WithRequest<GetRoomsRequest>.WithActionResult<GetRoomsResponse>
 {
-	private readonly IUserService _userService;
+	private readonly IBookingService _bookingService;
 	private readonly IDateTime _dateTime;
 	private readonly IApplicationDbContext _dbContext;
 
-	public GetRooms(IUserService userService, IDateTime dateTime, IApplicationDbContext dbContext)
+	public GetRooms(IBookingService bookingService, IDateTime dateTime, IApplicationDbContext dbContext)
 	{
-		_userService = userService;
+		_bookingService = bookingService;
 		_dateTime = dateTime;
 		_dbContext = dbContext;
 	}
@@ -46,7 +46,9 @@ public class GetRooms : EndpointBaseAsync.WithRequest<GetRoomsRequest>.WithActio
 			return BadRequest(ValidationExceptionBuilder.Build(validationResult.Errors));
 		}
 
-		var query = _dbContext.Rooms.AsQueryable();
+		var query = _dbContext.Rooms.Include(x => x.RoomFacilities)
+				.ThenInclude(x => x.Facility)
+				.AsQueryable();
 
 		if (request.FacilityIds != null && request.FacilityIds!.Length > 0)
 		{
@@ -56,7 +58,14 @@ public class GetRooms : EndpointBaseAsync.WithRequest<GetRoomsRequest>.WithActio
 			}
 		}
 
-		var rooms = query.Include(x => x.RoomFacilities).AsQueryable();
+		if (request.CheckInDate != null && request.CheckOutDate != null)
+		{
+			query = query.ToList()
+				.Where(x => !_bookingService.IsRoomBooked(x.RoomId, request.CheckInDate, request.CheckOutDate))
+				.AsQueryable();
+		}
+
+		var rooms = query.ToList();
 
 		return Ok(GetRoomsResponseExtension.Build(rooms));
 	}

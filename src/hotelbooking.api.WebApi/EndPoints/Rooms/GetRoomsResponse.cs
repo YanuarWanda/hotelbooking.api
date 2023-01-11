@@ -17,9 +17,9 @@ public class GetRoomsResponse
 
 public static class GetRoomsResponseExtension
 {
-	public static List<GetRoomsResponse> Build(IQueryable<Room> rooms)
+	public static List<GetRoomsResponse> Build(List<Room> rooms)
 	{
-		return rooms.Include(x => x.RoomFacilities).ThenInclude(x => x.Facility).Select(room => new GetRoomsResponse
+		return rooms.Select(room => new GetRoomsResponse
 		{
 			RoomId = room.RoomId,
 			Name = room.Name,

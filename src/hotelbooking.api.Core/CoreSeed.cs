@@ -37,6 +37,20 @@ public static class CoreSeed
 			await dbContext.SaveChangesAsync(CancellationToken.None);
 		}
 
+		if (!await dbContext.Rooms.AnyAsync(e => e.Name == "Kamar B"))
+		{
+			var room = new Room
+			{
+				Name = "Kamar B",
+				Description = "Deskripsi Kamar B",
+				Pax = 4,
+				PricePerNight = 450000
+			};
+
+			await dbContext.Rooms.AddAsync(room);
+			await dbContext.SaveChangesAsync(CancellationToken.None);
+		}
+
 		if (!await dbContext.Facilities.AnyAsync(e => e.Name == "TV"))
 		{
 			var facility = new Facility
@@ -53,6 +67,17 @@ public static class CoreSeed
 			var facility = new Facility
 			{
 				Name = "AC"
+			};
+
+			await dbContext.Facilities.AddAsync(facility);
+			await dbContext.SaveChangesAsync(CancellationToken.None);
+		}
+
+		if (!await dbContext.Facilities.AnyAsync(e => e.Name == "Kulkas"))
+		{
+			var facility = new Facility
+			{
+				Name = "Kulkas"
 			};
 
 			await dbContext.Facilities.AddAsync(facility);
@@ -77,6 +102,34 @@ public static class CoreSeed
 		{
 			var room = await dbContext.Rooms.FirstOrDefaultAsync(x => x.Name == "Kamar A");
 			var facility = await dbContext.Facilities.FirstOrDefaultAsync(x => x.Name == "AC");
+			var roomFacility = new RoomFacility
+			{
+				RoomId = room!.RoomId,
+				FacilityId = facility!.FacilityId
+			};
+
+			await dbContext.RoomFacilities.AddAsync(roomFacility);
+			await dbContext.SaveChangesAsync(CancellationToken.None);
+		}
+
+		if (!await dbContext.RoomFacilities.AnyAsync(e => e.Room!.Name == "Kamar B" && e.Facility!.Name == "AC"))
+		{
+			var room = await dbContext.Rooms.FirstOrDefaultAsync(x => x.Name == "Kamar B");
+			var facility = await dbContext.Facilities.FirstOrDefaultAsync(x => x.Name == "AC");
+			var roomFacility = new RoomFacility
+			{
+				RoomId = room!.RoomId,
+				FacilityId = facility!.FacilityId
+			};
+
+			await dbContext.RoomFacilities.AddAsync(roomFacility);
+			await dbContext.SaveChangesAsync(CancellationToken.None);
+		}
+
+		if (!await dbContext.RoomFacilities.AnyAsync(e => e.Room!.Name == "Kamar B" && e.Facility!.Name == "Kulkas"))
+		{
+			var room = await dbContext.Rooms.FirstOrDefaultAsync(x => x.Name == "Kamar B");
+			var facility = await dbContext.Facilities.FirstOrDefaultAsync(x => x.Name == "Kulkas");
 			var roomFacility = new RoomFacility
 			{
 				RoomId = room!.RoomId,
