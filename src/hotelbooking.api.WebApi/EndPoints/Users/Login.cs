@@ -7,6 +7,7 @@ using hotelbooking.api.Core.Interfaces;
 using hotelbooking.api.WebApi.Common;
 using hotelbooking.api.WebApi.Filters;
 using hotelbooking.api.WebApi.Models;
+using hotelbooking.api.WebApi.Services;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace hotelbooking.api.WebApi.EndPoints.Users;
@@ -14,12 +15,14 @@ namespace hotelbooking.api.WebApi.EndPoints.Users;
 public class Login : EndpointBaseAsync.WithRequest<LoginRequest>.WithActionResult<LoginResponse>
 {
 	private readonly IUserService _userService;
+	private readonly JwtService _jwtService;
 	private readonly IDateTime _dateTime;
 	private readonly IApplicationDbContext _dbContext;
 
-	public Login(IUserService userService, IDateTime dateTime, IApplicationDbContext dbContext)
+	public Login(IUserService userService, JwtService jwtService, IDateTime dateTime, IApplicationDbContext dbContext)
 	{
 		_userService = userService;
+		_jwtService = jwtService;
 		_dateTime = dateTime;
 		_dbContext = dbContext;
 	}
@@ -56,6 +59,6 @@ public class Login : EndpointBaseAsync.WithRequest<LoginRequest>.WithActionResul
 
 		await _dbContext.SaveChangesAsync(cancellationToken);
 
-		return Ok(LoginResponseExtension.Build(user));
+		return Ok(LoginResponseExtension.Build(_jwtService, user));
 	}
 }

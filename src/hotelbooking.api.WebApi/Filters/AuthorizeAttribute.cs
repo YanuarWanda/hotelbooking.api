@@ -10,9 +10,11 @@ namespace hotelbooking.api.WebApi.Filters;
 public class AuthorizeAttribute : Attribute, IAsyncActionFilter
 {
     private const string ApiKeyHeaderName = "ApiKey";
+	private bool _isLogin { get; }
 
-    public AuthorizeAttribute()
+    public AuthorizeAttribute(bool isLogin = false)
     {
+		_isLogin = isLogin;
     }
 
 	public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
@@ -32,6 +34,21 @@ public class AuthorizeAttribute : Attribute, IAsyncActionFilter
             context.Result = new UnauthorizedResult();
             return;
         }
+
+		if (_isLogin)
+		{
+			var service = context.HttpContext.RequestServices.GetService<ICurrentUserService>()!;
+
+			if (service.UserId == null)
+			{
+				context.Result =
+					new JsonResult(new ErrorResponse {Message = "Unauthorized"})
+					{
+						StatusCode = StatusCodes.Status401Unauthorized
+					};
+				return;
+			}
+		}
 
         await next();
 	}
