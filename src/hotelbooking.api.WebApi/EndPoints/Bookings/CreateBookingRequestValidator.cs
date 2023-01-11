@@ -7,8 +7,8 @@ public class CreateBookingRequestValidator : AbstractValidator<CreateBookingRequ
     public CreateBookingRequestValidator()
     {
 		RuleFor(e => e.RoomId).Cascade(CascadeMode.Stop).NotNull().NotEmpty();
-		RuleFor(e => e.CheckInDate).Cascade(CascadeMode.Stop).Must(BeAValidDate);
-		RuleFor(e => e.CheckOutDate).Cascade(CascadeMode.Stop).Must(BeAValidDate);
+		RuleFor(e => e.CheckInDate).Cascade(CascadeMode.Stop).Must(BeAValidDate).LessThan(e => e.CheckOutDate);
+		RuleFor(e => e.CheckOutDate).Cascade(CascadeMode.Stop).Must(BeAValidDate).GreaterThan(e => e.CheckInDate);
     }
 
 	private bool BeAValidDate(DateTime date)
