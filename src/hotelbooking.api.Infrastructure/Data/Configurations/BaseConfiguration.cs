@@ -11,11 +11,7 @@ public abstract class BaseEntityConfiguration<TBaseEntity> : IEntityTypeConfigur
     {
         builder.Ignore(e => e.Events);
 
-        builder.Property(e => e.CreatedBy).HasMaxLength(maxLength: 256);
-        builder.HasIndex(e => e.CreatedBy);
         builder.HasIndex(e => e.CreatedDt);
-        builder.Property(e => e.LastModifiedBy).HasMaxLength(maxLength: 256);
-        builder.HasIndex(e => e.LastModifiedBy);
         builder.HasIndex(e => e.LastModifiedDt);
 
         builder.HasQueryFilter(e => e.IsActive && e.DeletedDt == null);

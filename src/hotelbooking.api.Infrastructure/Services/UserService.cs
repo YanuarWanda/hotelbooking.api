@@ -18,21 +18,14 @@ public class UserService : IUserService
 	{
 		var query = _dbContext.Users.AsQueryable();
 
-		query = query.AsSplitQuery()
-			.Include(e => e.UserPasswords)
-			.Include(e => e.UserRoles)
-			.ThenInclude(e => e.Role)
-			.ThenInclude(e => e!.RolePermissions)
-			.ThenInclude(e => e.Permission);
-
 		return query;
 	}
 
-	public Task<User?> GetByUsernameAsync(string username, CancellationToken cancellationToken)
+	public Task<User?> GetByEmailAsync(string email, CancellationToken cancellationToken)
 	{
-		var s = username.ToUpperInvariant();
+		var s = email.ToUpper();
 
-		return GetBaseUserQueryable().Where(e => e.NormalizedUsername == s).FirstOrDefaultAsync(cancellationToken);
+		return GetBaseUserQueryable().Where(e => e.Email.ToUpper() == s).FirstOrDefaultAsync(cancellationToken);
 	}
 
 	public async Task<bool> CheckPasswordAsync(Guid userId, string password, CancellationToken cancellationToken)
@@ -42,13 +35,6 @@ public class UserService : IUserService
 			return false;
 
 		return string.Concat(user.Salt, password).ToSHA512() == user.HashedPassword;
-	}
-
-	public async Task<bool> IsEmailAddressExists(string email, CancellationToken cancellationToken)
-	{
-		var emailUpperCase = email.ToUpperInvariant();
-
-		return await _dbContext.Users.AnyAsync(e => e.NormalizedUsername == emailUpperCase, cancellationToken);
 	}
 
 	public async Task<IReadOnlyList<User>> GetAllAsync(int page, int size, CancellationToken cancellationToken)

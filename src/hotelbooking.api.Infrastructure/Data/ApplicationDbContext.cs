@@ -10,28 +10,19 @@ namespace hotelbooking.api.Infrastructure.Data;
 
 public class ApplicationDbContext : AuditContext, IApplicationDbContext
 {
-	private readonly ICurrentUserService? _currentUserService;
 	private readonly IDateTime? _dateTime;
 	private readonly IMediator? _mediator;
 
-	public ApplicationDbContext(DbContextOptions options,
-		ICurrentUserService? currentUserService,
-		IDateTime? dateTime,
-		IMediator? mediator) : base(options)
+	public ApplicationDbContext(DbContextOptions options, IMediator? mediator) : base(options)
 	{
-		_currentUserService = currentUserService;
-		_dateTime = dateTime;
 		_mediator = mediator;
 	}
 
 	public DbSet<User> Users => Set<User>();
-	public DbSet<UserLogin> UserLogins => Set<UserLogin>();
-	public DbSet<UserRole> UserRoles => Set<UserRole>();
-	public DbSet<UserPassword> UserPasswords => Set<UserPassword>();
-	public DbSet<UserToken> UserTokens => Set<UserToken>();
-	public DbSet<Role> Roles => Set<Role>();
-	public DbSet<Permission> Permissions => Set<Permission>();
-	public DbSet<RolePermission> RolePermissions => Set<RolePermission>();
+	public DbSet<Room> Rooms => Set<Room>();
+	public DbSet<Facility> Facilities => Set<Facility>();
+	public DbSet<RoomFacility> RoomFacilities => Set<RoomFacility>();
+	public DbSet<Booking> Bookings => Set<Booking>();
 
 	protected override void OnModelCreating(ModelBuilder builder)
 	{
@@ -57,12 +48,10 @@ public class ApplicationDbContext : AuditContext, IApplicationDbContext
 			switch (entry.State)
 			{
 				case EntityState.Added:
-					entry.Entity.CreatedBy = _currentUserService?.UserId;
 					entry.Entity.CreatedDt ??= _dateTime?.ScopedUtcNow;
 					break;
 
 				case EntityState.Modified:
-					entry.Entity.LastModifiedBy = _currentUserService?.UserId;
 					entry.Entity.LastModifiedDt = _dateTime?.ScopedUtcNow;
 					break;
 				case EntityState.Detached:
@@ -76,7 +65,7 @@ public class ApplicationDbContext : AuditContext, IApplicationDbContext
 			}
 		}
 
-		int result = await base.SaveChangesAsync(cancellationToken, _currentUserService?.UserId).ConfigureAwait(false);
+		int result = await base.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
 		// ignore events if no dispatcher provided
 		if (_mediator == null) return result;

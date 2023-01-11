@@ -92,14 +92,6 @@ public class DefaultInfrastructureModule : Module
 		builder.RegisterType<UserService>()
 			.As<IUserService>()
 			.InstancePerLifetimeScope();
-
-		builder.RegisterType<RoleService>()
-			.As<IRoleService>()
-			.InstancePerLifetimeScope();
-
-		builder.RegisterType<PermissionService>()
-			.As<IPermissionService>()
-			.InstancePerLifetimeScope();
 	}
 
 	private void RegisterDevelopmentOnlyDependencies(ContainerBuilder builder)

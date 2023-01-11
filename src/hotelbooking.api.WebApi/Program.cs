@@ -12,9 +12,9 @@ using hotelbooking.api.Core;
 using hotelbooking.api.Core.Interfaces;
 using hotelbooking.api.Infrastructure;
 using hotelbooking.api.Infrastructure.Data;
-using hotelbooking.api.WebApi;
 using hotelbooking.api.WebApi.Common;
-using hotelbooking.api.WebApi.Services;
+using hotelbooking.api.WebApi.Filters;
+using hotelbooking.api.WebApi.Models;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -39,28 +39,22 @@ builder.Services.AddControllers(opt =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-	c.OperationFilter<AddAuthorizationHeaderOperationFilter>();
-
 	c.SwaggerDoc(
 		name: "v1",
 		info: new OpenApiInfo {Title = "My API", Version = "v1"});
 
 	c.AddSecurityDefinition(
-		name: "Bearer",
+		name: "ApiKey",
 		securityScheme: new OpenApiSecurityScheme
 		{
-			Name = "Authorization",
+			Name = "ApiKey",
 			In = ParameterLocation.Header,
 			Type = SecuritySchemeType.ApiKey,
-			Scheme = "Bearer",
-			BearerFormat = "JWT",
-			Description = "Input your Bearer token in this format - Bearer {your token here} to access this API",
+			Description = "Input your API Key"
 		});
 
 	c.EnableAnnotations();
 });
-builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
-builder.Services.AddScoped<JwtService>();
 builder.Services.Configure<ApiBehaviorOptions>(options =>
 {
 	options.SuppressModelStateInvalidFilter = true;
@@ -115,9 +109,6 @@ app.UseSwagger();
 
 // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.), specifying the Swagger JSON endpoint.
 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1"));
-
-// Enable middleware for jwt authorization
-app.UseMiddleware<JwtMiddleware>();
 
 app.UseEndpoints(endpoints =>
 {
