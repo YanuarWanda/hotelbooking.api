@@ -17,3 +17,6 @@ Aplikasi Booking Hotel
 * `cd hotelbooking.api`
 * `dotnet restore`
 * `dotnet ef database update -c ApplicationDbContext -s ./src/hotelbooking.api.WebApi -p ./src/hotelbooking.api.Infrastructure`
+
+## Postman Collection
+https://drive.google.com/file/d/1yCWRnM6DpU_S032er6g0UnV03GwQbI4B/view?usp=share_link
